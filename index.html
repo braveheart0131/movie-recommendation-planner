@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MoodMovie AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-badge">AI Movie Recommendation Planner</div>
+      <h1>Find the right movie for your mood</h1>
+      <p>
+        Tell us how you feel, what kind of movie you want, and where you stream.
+        We’ll suggest movies that fit and explain why.
+      </p>
+    </header>
+
+    <main class="app-grid">
+      <section class="panel form-panel">
+        <h2>What are you in the mood for?</h2>
+
+        <form id="recommendForm" class="recommend-form">
+          <div class="field">
+            <label for="mood">Mood</label>
+            <select id="mood" required>
+              <option value="">Select a mood</option>
+              <option value="uplifting">Uplifting</option>
+              <option value="cozy">Cozy</option>
+              <option value="thought-provoking">Thought-provoking</option>
+              <option value="funny">Funny</option>
+              <option value="romantic">Romantic</option>
+              <option value="dark">Dark</option>
+              <option value="action-packed">Action-packed</option>
+              <option value="comfort-watch">Comfort watch</option>
+              <option value="family-night">Family night</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="genre">Genre</label>
+            <select id="genre">
+              <option value="">Any genre</option>
+              <option value="drama">Drama</option>
+              <option value="comedy">Comedy</option>
+              <option value="romance">Romance</option>
+              <option value="thriller">Thriller</option>
+              <option value="sci-fi">Sci-Fi</option>
+              <option value="action">Action</option>
+              <option value="adventure">Adventure</option>
+              <option value="fantasy">Fantasy</option>
+              <option value="animation">Animation</option>
+              <option value="family">Family</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="language">Language</label>
+            <select id="language">
+              <option value="">Any language</option>
+              <option value="English">English</option>
+              <option value="Hindi">Hindi</option>
+              <option value="Spanish">Spanish</option>
+              <option value="Korean">Korean</option>
+              <option value="Japanese">Japanese</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="runtime">Runtime</label>
+            <select id="runtime">
+              <option value="">Any runtime</option>
+              <option value="under 90 minutes">Under 90 minutes</option>
+              <option value="under 2 hours">Under 2 hours</option>
+              <option value="2+ hours">2+ hours</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="familyFriendly">Family Friendly</label>
+            <select id="familyFriendly">
+              <option value="">No preference</option>
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Streaming Subscriptions</label>
+            <div class="checkbox-grid">
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Netflix" />
+                <span>Netflix</span>
+              </label>
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Hulu" />
+                <span>Hulu</span>
+              </label>
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Prime Video" />
+                <span>Prime Video</span>
+              </label>
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Disney+" />
+                <span>Disney+</span>
+              </label>
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Max" />
+                <span>Max</span>
+              </label>
+              <label class="checkbox-chip">
+                <input type="checkbox" name="subscriptions" value="Apple TV+" />
+                <span>Apple TV+</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="vibe">Extra vibe details</label>
+            <textarea
+              id="vibe"
+              rows="4"
+              placeholder="Example: I want something emotional but not too heavy, visually beautiful, and easy to watch tonight."
+            ></textarea>
+          </div>
+
+          <button id="recommendBtn" type="submit" class="primary-btn">
+            Recommend Movies
+          </button>
+        </form>
+      </section>
+
+      <section class="panel results-panel">
+        <div class="section-header">
+          <h2>Recommendations</h2>
+          <p id="resultsSummary">Your movie picks will show up here.</p>
+        </div>
+
+        <div id="loadingState" class="loading-state hidden">
+          Finding your perfect movie night...
+        </div>
+
+        <div id="results" class="results-grid"></div>
+
+        <div id="emptyState" class="empty-state">
+          Pick your mood and preferences, then click <strong>Recommend Movies</strong>.
+        </div>
+      </section>
+
+      <aside class="panel watchlist-panel">
+        <div class="section-header">
+          <h2>My Watchlist</h2>
+          <p>Saved locally in your browser.</p>
+        </div>
+
+        <div id="watchlist" class="watchlist-list"></div>
+
+        <div id="watchlistEmpty" class="empty-state small">
+          No movies saved yet.
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
