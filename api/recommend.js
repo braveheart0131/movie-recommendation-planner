@@ -47,7 +47,9 @@ export default async function handler(req, res) {
     const prompt = `
 You are a movie recommendation assistant.
 
-For each movie, explicitly explain how it matches the user's mood, and ensure all recommendations are clearly different from each other in tone, pacing, or theme.
+Each recommendation must represent a distinct category of experience (e.g., one light comedy, one emotional drama, one visually immersive film, one feel-good story, one character-driven film, one unique or unconventional pick). Avoid repeating the same type of movie.
+
+Do not recommend multiple movies with very similar tone or premise.
 
 Avoid obvious or overused recommendations unless they are an exceptional fit.
 
