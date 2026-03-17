@@ -30,6 +30,8 @@ export default async function handler(req, res) {
       familyFriendly = "",
       vibe = "",
       subscriptions = [],
+      freePlatforms = [],
+      includeFree = false,
     } = req.body || {};
 
     if (!mood) {
@@ -61,6 +63,13 @@ User preferences:
         ? subscriptions.join(", ")
         : "None provided"
     }
+- Include free streaming options: ${includeFree ? "Yes" : "No"}
+- Preferred free platforms: ${
+  Array.isArray(freePlatforms) && freePlatforms.length
+    ? freePlatforms.join(", ")
+    : "None provided"
+}
+- If free streaming options are allowed, prefer movies available on the user's selected free platforms when possible.
 
 Return this exact JSON shape:
 {
@@ -103,7 +112,7 @@ Return this exact JSON shape:
 
     const enriched = await Promise.all(
       aiRecommendations.map((movie, index) =>
-        enrichWithTMDB(movie, index, subscriptions)
+        enrichWithTMDB(movie, index, subscriptions, freePlatforms, includeFree)
       )
     );
 
@@ -120,7 +129,7 @@ Return this exact JSON shape:
   }
 }
 
-async function enrichWithTMDB(movie, index, userSubscriptions = []) {
+async function enrichWithTMDB(movie, index, userSubscriptions = [], freePlatforms = [], includeFree = false) {
   const title = movie?.title?.trim();
   const year = movie?.year;
 
@@ -144,7 +153,7 @@ async function enrichWithTMDB(movie, index, userSubscriptions = []) {
   const details = await getTMDBMovieDetails(searchMatch.id);
   const providers = extractUSFlatrateProviders(details?.["watch/providers"]);
 
-  const streaming = prioritizeProviders(providers, userSubscriptions);
+  const streaming = prioritizeProviders(providers, userSubscriptions,freePlatforms, includeFree);
 
   return {
     id: String(searchMatch.id),
@@ -209,15 +218,29 @@ function extractUSFlatrateProviders(watchProviders) {
   return flatrate.map((p) => p.provider_name).filter(Boolean);
 }
 
-function prioritizeProviders(providers, userSubscriptions = []) {
+function prioritizeProviders(
+  providers,
+  userSubscriptions = [],
+  freePlatforms = [],
+  includeFree = false
+) {
   if (!Array.isArray(providers)) return [];
-  if (!Array.isArray(userSubscriptions) || !userSubscriptions.length) {
-    return providers;
-  }
 
-  const matches = providers.filter((p) => userSubscriptions.includes(p));
-  const others = providers.filter((p) => !userSubscriptions.includes(p));
-  return [...matches, ...others];
+  const paidMatches = providers.filter((p) => userSubscriptions.includes(p));
+  const freeMatches = includeFree
+    ? providers.filter((p) => freePlatforms.includes(p))
+    : [];
+  const others = providers.filter(
+    (p) => !paidMatches.includes(p) && !freeMatches.includes(p)
+  );
+
+  return [...paidMatches, ...freeMatches, ...others];
+}
+
+function formatProviders(providers, freePlatforms = []) {
+  return providers.map((p) =>
+    freePlatforms.includes(p) ? `${p} (Free)` : p
+  );
 }
 
 function getYear(dateString) {
