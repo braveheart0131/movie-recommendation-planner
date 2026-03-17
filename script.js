@@ -64,6 +64,11 @@ function getFormData() {
   const subscriptions = Array.from(
     document.querySelectorAll('input[name="subscriptions"]:checked')
   ).map((input) => input.value);
+  const freePlatforms = Array.from(
+  document.querySelectorAll('input[name="freePlatforms"]:checked')
+).map((input) => input.value);
+
+const includeFree = document.getElementById("includeFree").checked;
 
   return {
     mood: document.getElementById("mood").value,
@@ -73,6 +78,8 @@ function getFormData() {
     familyFriendly: document.getElementById("familyFriendly").value,
     vibe: document.getElementById("vibe").value.trim(),
     subscriptions
+    freePlatforms,
+    includeFree
   };
 }
 
