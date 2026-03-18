@@ -126,34 +126,46 @@ function renderResults(movies, formData) {
     const isSaved = watchlist.some((item) => item.id === movie.id);
 
     card.innerHTML = `
-      <img
-        class="movie-poster"
-        src="${movie.poster || 'https://via.placeholder.com/500x750?text=No+Poster'}"
-        alt="${escapeHtml(movie.title)} poster"
-        onerror="this.src='https://via.placeholder.com/500x750?text=No+Poster'"
-      />
+  <img
+    class="movie-poster"
+    src="${movie.poster || "https://via.placeholder.com/500x750?text=No+Poster"}"
+    alt="${escapeHtml(movie.title)} poster"
+    onerror="this.src='https://via.placeholder.com/500x750?text=No+Poster'"
+  />
 
-      <div class="movie-content">
-        <h3>${escapeHtml(movie.title)} (${movie.year})</h3>
-        <div class="movie-meta">${movie.genres.join(" • ")}</div>
+  <div class="movie-content">
+    <h3>${escapeHtml(movie.title)} (${movie.year || "—"})</h3>
 
-        <div class="movie-overview">${escapeHtml(movie.overview)}</div>
-        <div class="movie-why"><strong>Why it fits:</strong> ${escapeHtml(movie.whyRecommended)}</div>
+    <div class="movie-meta">
+      ${movie.genres?.length ? escapeHtml(movie.genres.join(" • ")) : "Genre info unavailable"}
+    </div>
 
-        <div class="badges">
-          ${movie.streaming.map((platform) => `<span class="badge">${escapeHtml(platform)}</span>`).join("")}
-        </div>
+    <div class="movie-overview">
+      ${escapeHtml(movie.overview || "Overview unavailable.")}
+    </div>
 
-        <div class="movie-actions">
-          <button class="primary-btn save-btn" data-id="${movie.id}">
-            ${isSaved ? "Saved to Watchlist" : "Add to Watchlist"}
-          </button>
-          <button class="secondary-btn refresh-btn" data-id="${movie.id}">
-            Similar Pick
-          </button>
-        </div>
-      </div>
-    `;
+    <div class="movie-why">
+      <strong>Why it fits:</strong> ${escapeHtml(movie.whyRecommended || "A strong match for your preferences.")}
+    </div>
+
+    <div class="badges">
+      ${
+        movie.streaming?.length
+          ? movie.streaming.map((platform) => `<span class="badge">${escapeHtml(platform)}</span>`).join("")
+          : `<span class="badge">Streaming info unavailable</span>`
+      }
+    </div>
+
+    <div class="movie-actions">
+      <button class="primary-btn save-btn" data-id="${movie.id}">
+        ${isSaved ? "Saved to Watchlist" : "Add to Watchlist"}
+      </button>
+      <button class="secondary-btn refresh-btn" data-id="${movie.id}">
+        Similar Pick
+      </button>
+    </div>
+  </div>
+`;
 
     const saveBtn = card.querySelector(".save-btn");
     const refreshBtn = card.querySelector(".refresh-btn");
