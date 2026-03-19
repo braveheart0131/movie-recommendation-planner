@@ -534,31 +534,3 @@ textarea::placeholder {
     width: 100%;
   }
 }
-
-.watch-item {
-  display: grid;
-  grid-template-columns: 60px 1fr;
-  gap: 12px;
-  align-items: center;
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.watch-poster {
-  width: 60px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.watch-info h4 {
-  margin: 0 0 6px;
-  font-size: 0.9rem;
-}
-
-.watch-actions {
-  display: flex;
-  gap: 6px;
-}
