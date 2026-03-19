@@ -345,6 +345,15 @@ textarea::placeholder {
   box-shadow: none;
 }
 
+#resetBtn {
+  margin-left: 10px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+}
+
 /* States */
 
 .loading-state,
