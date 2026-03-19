@@ -189,17 +189,16 @@ function renderResults(movies, formData) {
 }
 
 function addToWatchlist(movie) {
-  const exists = watchlist.find((item) => item.id === movie.id);
-  if (exists) return;
+  const alreadyExists = watchlist.some((item) => item.id === movie.id);
+  if (alreadyExists) return;
 
-  watchlist.push({
-    id: movie.id,
-    title: movie.title,
-    year: movie.year,
-    poster: movie.poster // 👈 ADD THIS
+  watchlist.unshift({
+    ...movie,
+    watched: false,
+    savedAt: new Date().toISOString()
   });
 
-  saveWatchlist();
+  persistWatchlist();
   renderWatchlist();
 }
 
@@ -229,30 +228,7 @@ function toggleWatched(id) {
 }
 
 function renderWatchlist() {
-  watchlistEl.innerHTML = watchlist
-  .map(
-    (movie) => `
-      <div class="watch-item">
-        <img
-          class="watch-poster"
-          src="${movie.poster || "https://via.placeholder.com/300x450?text=No+Poster"}"
-          alt="${escapeHtml(movie.title)}"
-          onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'"
-        />
-
-        <div class="watch-info">
-          <h4>${escapeHtml(movie.title)} (${movie.year || "—"})</h4>
-
-          <div class="watch-actions">
-            <button class="secondary-btn remove-btn" data-id="${movie.id}">
-              Remove
-            </button>
-          </div>
-        </div>
-      </div>
-    `
-  )
-  .join("");
+  watchlistEl.innerHTML = "";
 
   if (!watchlist.length) {
     watchlistEmpty.classList.remove("hidden");
@@ -266,18 +242,32 @@ function renderWatchlist() {
     item.className = "watch-item";
 
     item.innerHTML = `
-      <h4>${escapeHtml(movie.title)} (${movie.year})</h4>
-      <p>
-        ${escapeHtml(movie.genres.join(" • "))}<br />
-        ${movie.streaming.length ? `Watch on: ${escapeHtml(movie.streaming.join(", "))}` : "Streaming info unavailable"}
-      </p>
-      <div class="watch-actions">
-        <button class="secondary-btn watched-btn" data-id="${movie.id}">
-          ${movie.watched ? "Watched ✓" : "Mark Watched"}
-        </button>
-        <button class="danger-btn remove-btn" data-id="${movie.id}">
-          Remove
-        </button>
+      <img
+        class="watch-poster"
+        src="${movie.poster || "https://via.placeholder.com/300x450?text=No+Poster"}"
+        alt="${escapeHtml(movie.title)}"
+        onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'"
+      />
+
+      <div class="watch-info">
+        <h4>${escapeHtml(movie.title)} (${movie.year || "—"})</h4>
+        <p>
+          ${movie.genres?.length ? escapeHtml(movie.genres.join(" • ")) : "Genre info unavailable"}<br />
+          ${
+            movie.streaming?.length
+              ? `Watch on: ${escapeHtml(movie.streaming.join(", "))}`
+              : "Streaming info unavailable"
+          }
+        </p>
+
+        <div class="watch-actions">
+          <button class="secondary-btn watched-btn" data-id="${movie.id}">
+            ${movie.watched ? "Watched ✓" : "Mark Watched"}
+          </button>
+          <button class="danger-btn remove-btn" data-id="${movie.id}">
+            Remove
+          </button>
+        </div>
       </div>
     `;
 
