@@ -96,6 +96,82 @@ function getFormData() {
   };
 }
 
+document.getElementById("resetBtn")?.addEventListener("click", resetForm);
+
+function resetForm() {
+  // Basic selects / inputs
+  const fieldsToReset = [
+    "mood",
+    "genre",
+    "language",
+    "runtime",
+    "familyFriendly",
+    "vibe"
+  ];
+
+  fieldsToReset.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    if (el.tagName === "SELECT") {
+      el.selectedIndex = 0;
+    } else {
+      el.value = "";
+    }
+  });
+
+  // Clear paid subscription checkboxes
+  document
+    .querySelectorAll('input[name="subscriptions"]')
+    .forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+  // Clear free platform checkboxes
+  document
+    .querySelectorAll('input[name="freePlatforms"]')
+    .forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+
+  // Clear include free toggle
+  const includeFree = document.getElementById("includeFree");
+  if (includeFree) {
+    includeFree.checked = false;
+  }
+
+  // Optional: hide free platform section if your UI uses a toggle
+  const freePlatformsWrap = document.getElementById("freePlatformsWrap");
+  if (freePlatformsWrap) {
+    freePlatformsWrap.style.display = "none";
+  }
+
+  // Clear recommendations area
+  const resultsContainer = document.getElementById("results");
+  if (resultsContainer) {
+    resultsContainer.innerHTML = "";
+  }
+
+  // Clear error/status message if you have one
+  const statusMessage = document.getElementById("statusMessage");
+  if (statusMessage) {
+    statusMessage.textContent = "";
+  }
+
+  // Clear watchlist/search text if applicable
+  const searchInput = document.getElementById("search");
+  if (searchInput) {
+    searchInput.value = "";
+  }
+}
+
+document.getElementById("includeFree")?.addEventListener("change", function () {
+  const freePlatformsWrap = document.getElementById("freePlatformsWrap");
+  if (!freePlatformsWrap) return;
+
+  freePlatformsWrap.style.display = this.checked ? "block" : "none";
+});
+
 function setLoading(isLoading) {
   recommendBtn.disabled = isLoading;
   recommendBtn.textContent = isLoading ? "Finding Movies..." : "Recommend Movies";
