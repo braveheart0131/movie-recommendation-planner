@@ -75,20 +75,21 @@ recommendForm.addEventListener("submit", async (e) => {
 function getFormData() {
   const subscriptions = Array.from(
     document.querySelectorAll('input[name="subscriptions"]:checked')
-  ).map((input) => input.value);
-  const freePlatforms = Array.from(
-  document.querySelectorAll('input[name="freePlatforms"]:checked')
-).map((input) => input.value);
+  ).map((el) => el.value);
 
-const includeFree = document.getElementById("includeFree").checked;
+  const freePlatforms = Array.from(
+    document.querySelectorAll('input[name="freePlatforms"]:checked')
+  ).map((el) => el.value);
+
+  const includeFree = document.getElementById("includeFree")?.checked || false;
 
   return {
-    mood: document.getElementById("mood").value,
-    genre: document.getElementById("genre").value,
-    language: document.getElementById("language").value,
-    runtime: document.getElementById("runtime").value,
-    familyFriendly: document.getElementById("familyFriendly").value,
-    vibe: document.getElementById("vibe").value.trim(),
+    mood: document.getElementById("mood")?.value || "",
+    genre: document.getElementById("genre")?.value || "",
+    language: document.getElementById("language")?.value || "",
+    runtime: document.getElementById("runtime")?.value || "",
+    familyFriendly: document.getElementById("familyFriendly")?.value || "",
+    vibe: document.getElementById("vibe")?.value.trim() || "",
     subscriptions,
     freePlatforms,
     includeFree
@@ -360,3 +361,104 @@ function escapeHtml(str) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
+
+async function getRecommendations() {
+  const formData = getFormData();
+
+  const response = await fetch("/api/recommend", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(formData)
+  });
+
+  const data = await response.json();
+  console.log(data);
+}
+
+function normalizeArray(value) {
+  if (Array.isArray(value)) return value.map(String).map(v => v.trim()).filter(Boolean);
+  if (typeof value === "string") return value.split(",").map(v => v.trim()).filter(Boolean);
+  return [];
+}
+
+function normalizeBoolean(value) {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value.toLowerCase() === "true";
+  return false;
+}
+
+app.post("/api/recommend", async (req, res) => {
+  try {
+    const { 
+      mood = "",
+      genre = "",
+      language = "",
+      runtime = "",
+      familyFriendly = "",
+      vibe = ""
+    } = req.body || {};
+
+    const subscriptions = normalizeArray(req.body?.subscriptions);
+    const freePlatforms = normalizeArray(req.body?.freePlatforms);
+    const includeFree = normalizeBoolean(req.body?.includeFree);
+
+    const allowedPlatforms = [
+      ...subscriptions,
+      ...(includeFree ? freePlatforms : [])
+    ];
+
+    const prompt = `
+You are a smart movie recommendation assistant.
+
+User preferences:
+- Mood: ${mood || "any"}
+- Genre: ${genre || "any"}
+- Language: ${language || "any"}
+- Runtime: ${runtime || "any"}
+- Family friendly: ${familyFriendly || "any"}
+- Vibe: ${vibe || "none"}
+
+Platform rules:
+- Paid subscriptions selected: ${subscriptions.length ? subscriptions.join(", ") : "none"}
+- Include free platforms: ${includeFree ? "yes" : "no"}
+- Free platforms selected: ${freePlatforms.length ? freePlatforms.join(", ") : "none"}
+- Allowed platforms overall: ${allowedPlatforms.length ? allowedPlatforms.join(", ") : "none"}
+
+Important rules:
+- Recommend movies only from the allowed platforms list.
+- Prioritize paid subscriptions first.
+- Only use free platforms if includeFree is true.
+- Never mention platforms not selected by the user.
+
+Return valid JSON only:
+[
+  {
+    "title": "Movie Title",
+    "year": "2020",
+    "why": "Why it matches the user's taste",
+    "platform": "Netflix",
+    "platformType": "paid"
+  }
+]
+`;
+
+    // OpenAI call here
+
+    res.json({
+      success: true,
+      received: {
+        subscriptions,
+        freePlatforms,
+        includeFree,
+        allowedPlatforms
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong." });
+  }
+});
+
+
